@@ -7,6 +7,23 @@
     <link rel="stylesheet" href="css/matchstyles.css" />
 </head>
 <body>
+    
+    <div>
+
+        <span style="color: black;" id="infoJogadorAtual">        
+            <% if(partidaOffline.turno.jogadorAtual == 0 ) { %> 
+                JOGADOR
+            <% } else { %>
+                CPU
+            <% } %>
+        </span>
+        <br>
+        <span style="color: black;" id="infoContadorTurno">
+            Contador: <%= partidaOffline.turno.contadordeTurnos %> 
+        </span>
+
+    </div>
+
     <div class="hud-top">
         <div class="profile-box">
             <div class="profile-text p-side">
@@ -17,28 +34,21 @@
         </div>
 
         <div class="hud-center">
-            <div class="turn-text">OPPONENT'S TURN</div>
+            <div id="turn-button" onclick="endturn()" data-recursosJogador="<%= JSON.stringify(partidaOffline.recursosJogador) %>" class="turn-text">CLICK HERE TO END TURN</div>
             
             <div class="timer-bar-bg">
-                <div class="timer-fill"></div>
+                <div class="timer-fill" id="timer-fill"></div>
             </div>
 
             <div class="counters-row">
-                <div class="counter-item">
-                    <div class="c-box c-white"></div> <span>x 1</span>
-                </div>
-                <div class="counter-item">
-                    <div class="c-box c-blue"></div> <span>x 1</span>
-                </div>
-                <div class="counter-item">
-                    <div class="c-box c-yellow"></div> <span>x 1</span>
-                </div>
-                <div class="counter-item">
-                    <div class="c-box c-red"></div> <span>x 1</span>
-                </div>
-                <div class="counter-item">
-                    <div class="c-box c-black"></div> <span>x 4</span>
-                </div>
+
+                <% partidaOffline.recursosJogador.forEach(function(recurso) { %> 
+                    <div class="counter-item">
+                        <div class="c-box c-<%= recurso.energyType %>"></div>
+                        <span>x </span>
+                        <span id="energy-<%= recurso.energyType %>"><%= recurso.amount %></span>
+                    </div>                
+                <% }); %>
             </div>
         </div>
 
@@ -55,13 +65,31 @@
             <% partidaOffline.timePersonagens.forEach(function(personagem) { %> 
                 <div class="player-card">
                     <div class="portrait-wrapper">
-                        <div class="portrait" onclick="infobox('<%= personagem.description %>', '<%= personagem.name %>', '<%= personagem.portrait %>')" data-charid="<%= personagem.charid %>" style="background-image: url('<%= personagem.portrait %>');"></div>
+                        <div class="portrait" 
+                            data-description        ="<%= personagem.description %>"
+                            data-name               ="<%= personagem.name %>"
+                            data-portrait           ="<%= personagem.portrait %>"
+                            onclick                 ="infobox(this)"
+                            data-charid             ="<%= personagem.charid %>" 
+                            style                   ="background-image: url('<%= personagem.portrait %>');">
+                        </div>
                         <div class="health-bar">100 / 100</div>
+
+                        <!-- onclick="infobox('<%= personagem.description %>', '<%= personagem.name %>', '<%= personagem.portrait %>')"  -->
+
                     </div>
                     <div class="skills-rect">
                     <% personagem.skills.forEach(function(skill) { %> 
+                        <div class="skill" 
+                            data-description    ="<%= skill.description %>"
+                            data-name           ="<%= skill.name %>"
+                            data-portrait       ="<%= skill.skillportrait %>"
+                            onclick             ="infobox(this)"
+                            data-skillid        ="<%= skill.skillid %>" 
+                            style               ="background-image: url('<%= skill.skillportrait %>');">
+                        </div>
 
-                        <div class="skill" onclick="infobox('<%= skill.description %>', '<%= skill.name %>', '<%= skill.skillportrait %>')" data-skillid="<%= skill.skillid %>" style="background-image: url('<%= skill.skillportrait %>');"></div>
+                        <!-- onclick="infobox('<%= skill.description %>', '<%= skill.name %>', '<%= skill.skillportrait %>')"  -->
 
                     <% }); %>
                     </div>
@@ -72,139 +100,140 @@
         <aside class="cpu-col">
             <% partidaOffline.timePersonagensCPU.forEach(function(cpu) { %> 
                 <div class="portrait-wrapper">
-                    <div class="cpu-portrait" onclick="infobox('<%= cpu.description %>', '<%= cpu.name %>', '<%= cpu.portrait %>')" data-charid="<%= cpu.charid %>" style="background-image: url('<%= cpu.portrait %>');"></div>
+                    <div class="cpu-portrait" 
+                        data-description    ="<%= cpu.description %>"
+                        data-name           ="<%= cpu.name %>"
+                        data-portrait       ="<%= cpu.portrait %>"
+                        onclick             ="infobox(this)"
+                        data-charid         ="<%= cpu.charid %>" 
+                        style               ="background-image: url('<%= cpu.portrait %>');">
+                    </div>
                     <div class="health-bar">100 / 100</div>
+
+                    <!-- onclick="infobox('<%= cpu.description %>', '<%= cpu.name %>', '<%= cpu.portrait %>')"  -->
+
                 </div>      
             <% }); %>
-<!-- 
-            <div class="portrait-wrapper">
-                <div class="cpu-portrait1"></div>
-                <div class="health-bar">100 / 100</div>
-            </div>
-
-            <div class="portrait-wrapper">
-                <div class="cpu-portrait2"></div>
-                <div class="health-bar">100 / 100</div>
-            </div>
-
-            <div class="portrait-wrapper">
-                <div class="cpu-portrait3"></div>
-                <div class="health-bar">100 / 100</div>
-            </div> -->
         </aside>
 
-        <div class="skilinfoportrait" style="background-image: url('img/skillportraits/1.png')"></div>
-        <div class="skillinfoboxname">ZANGETSU SLASH</div>
-        <div class="skillinfoboxdesc">
-            <p>ICHIGO CHARGES AT THE ENEMY WITH HIS SWORD, DEALING 20 PHYSICAL DAMAGE TO ONE ENEMY.THIS SKILL WILL DEAL 5 MORE PHYSICAL DAMAGE EVERY TIME IT IS USED.</p>
-        </div>
+        <div class="infoboxportrait"    style="display: none;"></div>
+        <div class="infoboxname"        style="display: none;"></div>
+        <div class="infoboxdesc"        style="display: none;"></div>
 
     </div>
 </body>
 
 <script>
     
+    document.addEventListener("DOMContentLoaded", function() {
+        startCountdown(300);
 
-    function infobox(description, name, portrait) {
-        document.querySelector('.skilinfoportrait').style.backgroundImage = `url('${portrait}')`;
-        document.querySelector('.skillinfoboxname').textContent = name.toUpperCase();
-        document.querySelector('.skillinfoboxdesc').innerHTML = `<p>${description.toUpperCase()}</p>`;
+        //Fetch para validar quais skills estão disponíveis para o jogador, e quais estão bloqueadas, baseado nos recursos atuais do jogador, e atualizar a interface de acordo
+        //Quando começar a partida, atribuir recursos pro jogador.        
+        //Usar localstore para identificar os personagens e suas skill, e os recursos do jogador.
+
+    });
+
+    function startCountdown(contador) {
+        var bar = document.getElementById("timer-fill");
+        var width = 100;
+        var interval = setInterval(frame, contador);
+
+        function frame() {
+            if (width <= 0) {
+                clearInterval(interval);                
+                //Passar turno
+                endturn();
+            } else {
+                width--;
+                bar.style.width = width + "%";
+            }
+        }
     }
 
-</script>
+    function infobox(element) {
 
-        <!-- // aqui ele está pegando os IDs que o game.html passou por URL (Ex: matchoffline.html?p1=1&p2=2&p3=3)
-        const params = new URLSearchParams(window.location.search);
-        const p1 = parseInt(params.get('p1'));
-        const p2 = parseInt(params.get('p2'));
-        const p3 = parseInt(params.get('p3'));
+        const description =     element.getAttribute('data-description');
+        const name =            element.getAttribute('data-name');
+        const portrait =        element.getAttribute('data-portrait');
 
-        if (!p1 || !p2 || !p3) return;
+        document.querySelector('.infoboxportrait')  .style.backgroundImage = `url('${portrait}')`;
+        document.querySelector('.infoboxname')      .textContent = name.toUpperCase();
+        document.querySelector('.infoboxdesc')      .innerHTML = `<p>${description.toUpperCase()}</p>`;
 
-        try {
-            // aqui ele está pegando os dados dos personagens 
-            const response = await fetch('json/charstest.json');
-            const data = await response.json();
-            
-            // aqui ele está procurando os chars selecionados dentro do JSON, usando os IDs que ele pegou da URL
-            const team = [
-                data.characters.find(c => c.charid === p1),
-                data.characters.find(c => c.charid === p2),
-                data.characters.find(c => c.charid === p3)
-            ];
+        document.querySelector('.infoboxportrait').     style.display = 'block';
+        document.querySelector('.infoboxname').         style.display = 'block';
+        document.querySelector('.infoboxdesc').         style.display = 'block';
 
-            // aqui ele atualiza os dados na tela, colocando os retratos dos personagens e das skills nos lugares certos
-            team.forEach((char, index) => {
-                if (!char) return;
+    }
 
-                const portraitDiv = document.querySelector(`.portraitc${index + 1}`);
-                if (portraitDiv) {
-                    portraitDiv.style.backgroundImage = `url('${char.portrait}')`;
-                    portraitDiv.setAttribute('data-charid', char.charid); 
+    function endturn() {
+        fetch("/passarTurno", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        }).then(response => { // energias atualizadas
+            response.json().then(dadosPartida => {
+                console.log("Dados do servidor:", dadosPartida);  
+                var bar = document.getElementById("timer-fill");
+                bar.style.width = "100%";
 
-                    // aqui ele adiciona um evento de clique para cada retrato, para mostrar as informações do personagem na caixa de descrição
-                    portraitDiv.addEventListener('click', () => {
-                        document.querySelector('.skilinfoportrait').style.backgroundImage = `url('${char.portrait}')`;
-                        document.querySelector('.skillinfoboxname').textContent = char.name.toUpperCase();
-                        document.querySelector('.skillinfoboxdesc').innerHTML = `<p>${char.description.toUpperCase()}</p>`;
-                    });
-
-                }
-
-                char.skills.forEach((skill, skillIndex) => {
-                    const globalSkillIndex = (index * 4) + skillIndex + 1;
-                    const skillDiv = document.querySelector(`.skill${globalSkillIndex}`);
-                    
-                    if (skillDiv) {
-                        skillDiv.style.backgroundImage = `url('${skill.skillportrait}')`;
-                        skillDiv.setAttribute('data-skillid', skill.skillid);
-                        skillDiv.style.cursor = 'default';
-                        // aqui ele adiciona um evento de clique para cada skill, para mostrar as informações dela na caixa de descrição
-                        skillDiv.addEventListener('click', () => {
-                            document.querySelector('.skilinfoportrait').style.backgroundImage = `url('${skill.skillportrait}')`;
-                            document.querySelector('.skillinfoboxname').textContent = skill.name.toUpperCase();
-                            document.querySelector('.skillinfoboxdesc').innerHTML = `<p>${skill.description.toUpperCase()}</p>`;
-
-                        });
+                dadosPartida.recursosJogador.forEach(energy => {
+                    const energyElement = document.getElementById(`energy-${energy.energyType}`);
+                    if (energyElement) {
+                        energyElement.textContent = energy.amount;
                     }
                 });
-            });
 
-            // aqui ele gera o time do CPU de forma aleatória, escolhendo 3 personagens aleatórios (sem repetir) do JSON
-            const cpuTeam = [];
-            const availableChars = [...data.characters];
+                const turnButton = document.getElementById('turn-button');
+                if (dadosPartida.turno.jogadorAtual === 0) {
+                    turnButton.textContent = "CLICK HERE TO END TURN";
+                    document.getElementById("infoJogadorAtual").textContent = "Jogador";
+                    document.getElementById("infoContadorTurno").textContent = `Turn: ${dadosPartida.turno.contadordeTurnos}`;
+                    startCountdown(300);
+                } 
+                else {
+                    turnButton.textContent = "OPPONENT'S TURN";
+                    document.getElementById("infoJogadorAtual").textContent = "CPU";
+                    document.getElementById("infoContadorTurno").textContent = `Turn: ${dadosPartida.turno.contadordeTurnos}`;
+                    // startCountdown(70);
 
-            for (let i = 0; i < 3; i++) {
-                if (availableChars.length === 0) break;
-                // aqui ele pega um índice aleatório do array de personagens e adiciona o personagem correspondente ao time do CPU
-                const randomIndex = Math.floor(Math.random() * availableChars.length);
-                cpuTeam.push(availableChars[randomIndex]);
-                availableChars.splice(randomIndex, 1);
-            }
+                    setTimeout(() => { // Simula o tempo de resposta do CPU, e depois passa o turno de volta para o jogador
+                        fetch("/passarTurno", {
+                            method: "POST",
+                            headers: {
+                                "Content-type": "application/json; charset=UTF-8"
+                            }
+                        }).then(response => { // energias atualizadas
+                            response.json().then(dadosPartida => {
+                                console.log("Dados do servidor:", dadosPartida);                 
 
-            // atualizar a tela do CPU com os personagens que ele escolheu, colocando os retratos nos lugares certos e adicionando o evento de clique para mostrar as informações na caixa de descrição
-            cpuTeam.forEach((char, index) => {
-                if (!char) return;
+                                dadosPartida.recursosJogador.forEach(energy => {
+                                    const energyElement = document.getElementById(`energy-${energy.energyType}`);
+                                    if (energyElement) {
+                                        energyElement.textContent = energy.amount;
+                                    }
+                                });
 
-                const cpuPortraitDiv = document.querySelector(`.cpu-portrait${index + 1}`);
-                if (cpuPortraitDiv) {
-                    cpuPortraitDiv.style.backgroundImage = `url('${char.portrait}')`;
-                    cpuPortraitDiv.setAttribute('data-charid', char.charid);
-                    cpuPortraitDiv.style.cursor = 'default';
-
-                    cpuPortraitDiv.addEventListener('click', () => {
-                        document.querySelector('.skilinfoportrait').style.backgroundImage = `url('${char.portrait}')`;
-                        document.querySelector('.skillinfoboxname').textContent = char.name.toUpperCase();
-                        document.querySelector('.skillinfoboxdesc').innerHTML = `<p>${char.description.toUpperCase()}</p>`;
-                    });
+                                const turnButton = document.getElementById('turn-button');
+                                if (dadosPartida.turno.jogadorAtual === 0) {
+                                    turnButton.textContent = "CLICK HERE TO END TURN";
+                                    document.getElementById("infoJogadorAtual").textContent = "Jogador";
+                                    document.getElementById("infoContadorTurno").textContent = `Turn: ${dadosPartida.turno.contadordeTurnos}`;
+                                    startCountdown(300);
+                                } else {
+                                    turnButton.textContent = "OPPONENT'S TURN";
+                                    document.getElementById("infoJogadorAtual").textContent = "CPU";
+                                    document.getElementById("infoContadorTurno").textContent = `Turn: ${dadosPartida.turno.contadordeTurnos}`;                                    
+                                    // startCountdown(70);
+                                }
+                            });
+                        });
+                    }, 1000);
                 }
             });
-
-        } catch (error) {
-            console.error("Error loading character data:", error);
-        }
-    }); -->
-
-
-
+        });
+    }
+</script>
 </html>

@@ -37,6 +37,163 @@
             font-size: 16px;
         }
 
+        .menuinfobox {
+            position: absolute;
+            bottom: 480px;
+            left: 100px;
+            width: 845px;
+            height: 325px;
+            background-color: rgba(163, 163, 163, 0.85);
+            border: 3px solid #000;
+            display: none;
+            color: white;
+            padding: 20px;
+            box-sizing: border-box;
+            font-family: monospace;
+            z-index: 50;
+            box-shadow: 0 0 15px rgba(0,0,0,0.8);
+        }
+
+        .menuinfoboxportrait {
+            width: 125px;
+            height: 125px;
+            border: 2px solid black;
+            background-size: cover;
+            background-position: center;
+            float: left;
+            margin-right: 25px;
+        }
+
+        .menuinfoboxname {
+            position: absolute;
+            bottom: 120px;
+            font-size: 20px;
+            font-weight: bold;
+            color: darkred;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+
+        }
+
+        .menuinfoboxdescription {
+            position: absolute;
+            bottom: 35px;
+            left: 20px;
+            width: 650px;
+            height: 110px;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #000000;
+            overflow-y: auto;
+            margin: 0;
+            padding-right: 10px;
+        }
+
+        .menuinfoboxtags {
+            position: absolute;
+            bottom: 10px;
+            left: 20px;
+            font-size: 12px;
+            color: darkred;
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        .menuinfoboxenergy {
+            position: absolute;
+            bottom: 140px;
+            left: 413px;
+            display: none;
+            gap: 4px;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: darkred;
+            white-space: nowrap;
+        }
+            .energy-item {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                font-size: 16px;
+                font-weight: bold;
+                color: white;
+                text-shadow: 1px 1px 0 black;
+            }
+                .c-box {
+                    width: 12px;
+                    height: 12px;
+                    border: 1px solid black;
+                    flex-shrink: 0;
+                    display: inline-block;
+                }
+                    .c-white  { background-color: white; }
+                    .c-blue   { background-color: blue; }
+                    .c-yellow { background-color: yellow; }
+                    .c-red    { background-color: red; }
+                    .c-black  { background-color: black; }
+                    .c-purple { background-color: purple; }
+
+        .menuinfoboxcooldown {
+            position: absolute;
+            bottom: 10px;
+            left: 720px;
+            font-size: 12px;
+            color: darkred;
+            font-family: monospace;
+            font-weight: bold;
+            display: none;
+        }
+
+        .menuinfoboxskills {
+            position: absolute;
+            top: 20px;
+            left: 275px;
+            width: 555px;
+            height: 140px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        .menuinfoboxskill {
+            min-width: 125px;
+            height: 125px;
+            border: 2px solid black;
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+        }
+
+        .menuinfoboxskillportrait {
+            position: absolute;
+            bottom: 25px;
+            left: 693px;
+            width: 125px;
+            height: 125px;
+            border: 2px solid black;
+            background-size: cover;
+            background-position: center;
+            display: none;
+        }
+
+        .menuinfoboxskills::-webkit-scrollbar {
+            height: 8px;
+        }
+        .menuinfoboxskills::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2); 
+            border-radius: 4px;
+        }
+        .menuinfoboxskills::-webkit-scrollbar-thumb {
+            background: darkred; 
+            border-radius: 4px;
+        }
+        .menuinfoboxskills::-webkit-scrollbar-thumb:hover {
+            background: red; 
+        }
+
         .player-info {
             position: absolute;
             top: 565px;

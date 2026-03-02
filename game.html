@@ -38,6 +38,19 @@
         </div>
     </div>
 
+    <div class="menuinfobox">
+        <div class="menuinfoboxportrait"    ></div>
+        <div class="menuinfoboxskills"      ></div>
+
+        <div class="menuinfoboxskillportrait" ></div>
+
+        <div class="menuinfoboxname"        ></div>
+        <div class="menuinfoboxdescription" ></div>
+        <div class="menuinfoboxtags"        ></div>
+        <div class="menuinfoboxenergy"      ></div>
+        <div class="menuinfoboxcooldown"    ></div>
+
+    </div>
 
     <div class="player-info">
         <div class="player-portrait" style="background-image: url('img/charportraits/0.png');"></div>
@@ -68,13 +81,113 @@
     <div class="character-grid">
 
         <% jsonData.characters.forEach(function(personagem) { %>
-        <div draggable="true" ondragstart="rastrearMovimento(event)" class="box" data-charid="<%= personagem.charid %>" id="charid-<%= personagem.charid %>" style="background-image: url('<%= personagem.portrait %>');"></div>
+        <div draggable="true" 
+            ondragstart="rastrearMovimento(event)"
+            onclick="showMenuinfobox(this)" 
+            class="box" 
+            data-charid="<%= personagem.charid %>" 
+            data-name="<%= personagem.name %>"
+            data-description="<%= personagem.description %>"
+            data-tags="<%= personagem.tags.join(', ') %>"
+            data-portrait="<%= personagem.portrait %>"
+            data-skills="<%= JSON.stringify(personagem.skills) %>"
+            id="charid-<%= personagem.charid %>" 
+            style="background-image: url('<%= personagem.portrait %>');"></div>
         <% }); %>
         
     </div>
 </body>
 <script src="js/script.js"></script>
 <script>
+
+     function showMenuinfobox(element) {
+        const charID = element.getAttribute("data-charid");
+
+        if (!charID || charID === "0") {
+            document.querySelector(".menuinfobox").style.display = "none";
+            return;
+        }
+
+        const name = element.getAttribute("data-name");
+        const description = element.getAttribute("data-description");
+        const tags = element.getAttribute("data-tags");
+        const portrait = element.getAttribute("data-portrait");
+        const skillsInfo = element.getAttribute("data-skills");
+
+        document.querySelector(".menuinfoboxportrait").style.backgroundImage = `url('${portrait}')`;
+        document.querySelector(".menuinfoboxname").textContent = name.toUpperCase();
+        document.querySelector('.menuinfoboxdescription').innerHTML = `<p>${description}</p>`;
+        document.querySelector('.menuinfoboxtags').textContent = `Tags: ${tags}`;
+        
+        document.querySelector(".menuinfoboxskillportrait").style.display = "none";
+        document.querySelector(".menuinfoboxenergy").style.display = "none";
+        document.querySelector(".menuinfoboxcooldown").style.display = "none";
+
+        const skillsContainer = document.querySelector(".menuinfoboxskills");
+        skillsContainer.innerHTML = "";
+
+        if (skillsInfo) {
+            const skillsArray = JSON.parse(skillsInfo);
+            skillsArray.forEach(skill => {
+                const skillDiv = document.createElement("div");
+                skillDiv.className = "menuinfoboxskill";
+                skillDiv.style.backgroundImage = `url('${skill.skillportrait}')`;
+
+                skillDiv.onclick = function() {
+                    showSkillInfo(skill);
+                };
+
+                skillsContainer.appendChild(skillDiv);
+            });
+        }
+
+        document.querySelector(".menuinfobox").style.display = "block";
+
+    }
+
+    function showSkillInfo(skill) {
+        document.querySelector(".menuinfoboxname").textContent = skill.name.toUpperCase();
+        document.querySelector(".menuinfoboxdescription").innerHTML = `<p>${skill.description}</p>`;
+        
+        const skillPortrait = document.querySelector(".menuinfoboxskillportrait");
+        skillPortrait.style.backgroundImage = `url('${skill.skillportrait}')`;
+        skillPortrait.style.display = "block";
+
+        if (skill.skilltags) {
+            document.querySelector(".menuinfoboxtags").textContent = `Tags: ${skill.skilltags.join(', ')}`;
+        }
+
+        const cooldownBox = document.querySelector(".menuinfoboxcooldown");
+        cooldownBox.textContent = `Cooldown: ${skill.cooldown}`;
+        cooldownBox.style.display = "block";
+
+        const energyBox = document.querySelector(".menuinfoboxenergy");
+        energyBox.innerHTML = "";
+
+        if (skill.energycost && Object.keys(skill.energycost).length > 0) {
+            const prefixSpan = document.createElement("span");
+            prefixSpan.textContent = "Energy: ";
+            prefixSpan.style.marginRight = "5px"; 
+            energyBox.appendChild(prefixSpan);
+
+            for (const [type, amount] of Object.entries(skill.energycost)) {
+                for (let i = 0; i < amount; i++) {
+                    const boxDiv = document.createElement("div");
+                    boxDiv.className = `c-box c-${type.toLowerCase()}`;
+                    energyBox.appendChild(boxDiv);
+                }
+            }
+        } else {
+            const freeSpan = document.createElement("span");
+            freeSpan.className = "energy-item";
+            freeSpan.textContent = "Energy:";
+            energyBox.appendChild(freeSpan);
+        }
+
+        energyBox.style.display = "flex";
+        energyBox.style.flexDirection = "row";
+        energyBox.style.alignItems = "center";
+    }
 
     function drop(event) {
         event.preventDefault();
@@ -92,6 +205,15 @@
                 var charPortrait = originalChar.style.backgroundImage;
                 targetBox.style.backgroundImage = charPortrait;
                 targetBox.setAttribute("data-charid", charId.split("-")[1]);
+
+                targetBox.setAttribute("data-name", originalChar.getAttribute("data-name"));
+                targetBox.setAttribute("data-description", originalChar.getAttribute("data-description"));
+                targetBox.setAttribute("data-tags", originalChar.getAttribute("data-tags"));
+                targetBox.setAttribute("data-portrait", originalChar.getAttribute("data-portrait"));
+                targetBox.setAttribute("data-skills", originalChar.getAttribute("data-skills"));
+
+                targetBox.onclick = function() { showMenuinfobox(this); };
+
             }
 
             originalChar.style.visibility = "hidden";
@@ -129,6 +251,9 @@
             targetBox.setAttribute("data-charid", "0");
             
             console.log("Personagem removido da equipe.");
+
+            document.querySelector(".menuinfobox").style.display = "none";
+
         }
     }
 
