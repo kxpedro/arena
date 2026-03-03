@@ -75,6 +75,11 @@ body{
   filter: grayscale(100%);
 }
 
+  .skill.skill-active {
+    filter: grayscale(0%);
+    cursor: pointer;
+  }
+
 .cpu-col{
   display:flex;
   flex-direction:column;

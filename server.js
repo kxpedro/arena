@@ -27,12 +27,66 @@ app.get('/jogar', (req, res) => {
   localStorage.removeItem('recursosCPU');
 });
 
+app.post('/usarSkill', (req, res) => {
+  const { skillId, target } = req.body; //Qual skill foi utilizada e qual o alvo, podendo ser self, enemy e ally.
+  var healthBarNewValue = 100; // Simulando o novo valor da barra de vida após usar a skill
+  var isDefeated = false;
+
+  const time = JSON.parse(localStorage.getItem('time'));
+  const timeCPU = JSON.parse(localStorage.getItem('timeCPU'));
+
+  const timePersonagens = time.map(id => jsonCharstest.characters.find(personagem => personagem.charid == parseInt(id)));
+  const timePersonagensCPU = timeCPU.map(id => jsonCharstest.characters.find(personagem => personagem.charid == parseInt(id)));
+
+  const skillUsed = timePersonagens.flatMap(personagem => personagem.skills).find(skill => skill.skillid ===  parseInt(skillId));
+
+  if (skillUsed) { // Verifica se a skill existe
+
+    // Se a skill é para inimigos, o alvo é a CPU
+    if(skillUsed.target.enemy == 1 && target.enemy == 1){
+      var damage = skillUsed.damage.value; 
+      var cpuTarget = timePersonagensCPU.find(cpu => cpu.charid === parseInt(target.charId));
+      healthBarNewValue -= damage;
+      if(healthBarNewValue <= 0){        
+        isDefeated = true;
+      }
+
+    }else if((skillUsed.target.ally == 1 && skillUsed.target.self == 0) &&
+             (target.ally == 1           && target.self == 0)){ 
+
+
+    }else if(skillUsed.target.ally == 1 && skillUsed.target.self == 1){
+
+    }
+
+  }else {
+    return res.status(404).send({ error: 'Skill not found' });
+  }
+
+  res.send({healthBarNewValue: healthBarNewValue, isDefeated: isDefeated, charid: target.charId, enemy: target.enemy}); 
+});
+
 app.get('/partida', (req, res) => {
   const time = JSON.parse(localStorage.getItem('time'));
   const timePersonagens = time.map(id => jsonCharstest.characters.find(personagem => personagem.charid == parseInt(id)));
  
+  timePersonagens.forEach(personagem => {
+    personagem.health = 100;
+    personagem.isDefeated = false;
+    personagem.buffs = [];
+    personagem.debuffs = [];
+  });
+
   const timeCPU = [1,2,3]; // implementar RNG
   const timePersonagensCPU = timeCPU.map(id => jsonCharstest.characters.find(personagem => personagem.charid == parseInt(id)));
+  localStorage.setItem('timeCPU', JSON.stringify(timeCPU));
+
+  timePersonagensCPU.forEach(personagem => {
+    personagem.health = 100;
+    personagem.isDefeated = false;
+    personagem.buffs = [];
+    personagem.debuffs = [];
+  });
 
   var recursosJogador;
   var recursosCPU;
@@ -50,6 +104,12 @@ app.get('/partida', (req, res) => {
       {"energyType" : "white", "amount": 0},
       {"energyType" : "purple", "amount": 0}
     ];
+
+    // aqui é pra dar 1 energia aleatoria pro jogador no começo da partida
+    const energiasIniciais = ["red", "blue", "yellow", "white"];
+    const energiaInicialJogador = energiasIniciais[Math.floor(Math.random() * energiasIniciais.length)];
+
+    recursosJogador.find(eng => eng.energyType == energiaInicialJogador).amount++;
 
     recursosCPU = 
     [
@@ -87,27 +147,53 @@ app.get('/partida', (req, res) => {
 
 app.get('/validarUsoSkills', (req, res) => {
 
-  var recursosJogador = JSON.parse(localStorage.getItem('recursosJogador'));
-  const time = JSON.parse(localStorage.getItem('time'));
+  var recursosJogador = JSON.parse(localStorage.getItem('recursosJogador')) || [];
+  const time = JSON.parse(localStorage.getItem('time')) || [];
   const timePersonagens = time.map(id => jsonCharstest.characters.find(personagem => personagem.charid == parseInt(id)));
+
+  // aqui vai contar quanto de energia o jogador tem no total
+  const totalEnergiaJogador = recursosJogador.reduce((total, recurso) => total + recurso.amount, 0);
 
   timePersonagens.forEach(personagem => {    
     personagem.skills.forEach(skill => {
-      const recursoSkill = skill.energycost; //red, yellow, blue, etc
-      if(recursoSkill.red){
-        if(recursosJogador.find(eng => eng.energyType == "red" ).amount >= recursoSkill.red)        {
-          skill.usable = true;
+      var skillUsable = true;
+      const skillCost = skill.energycost; //red, yellow, blue, etc
+
+      // até entao se a skill nao tem custo, ela é sempre usável, caso contrário, verifica se o jogador tem recursos suficientes para usar a skill
+
+      if (skillCost) {
+
+        // aqui ele vê quanto essa skill pede de energia específica (ex: pede 1 red), para descontar do total na hora de checar black
+        var custoEspecificoSkill = 0;
+        for (const [tipo, qtd] of Object.entries(skillCost)) {
+            if (tipo !== 'black') custoEspecificoSkill += qtd;
+        }
+
+        for (const [energia, quantidade] of Object.entries(skillCost)) {
+          // Se for black, verifica se o total de energia (sobra) é suficiente
+
+          if (energia === 'black') {
+            if (totalEnergiaJogador < custoEspecificoSkill + quantidade) {
+              skillUsable = false;
+              break;
+            }
+          } else {
+            // aqui ele procura se o jogador tem os recursos ESPECÍFICOS (Red, Blue, etc)
+            const recursoJogador = recursosJogador.find(eng => eng.energyType == energia);
+            // se o jogador nao tem o recurso ou a quantidade do recurso é menor que a quantidade necessária para usar a skill, a skill nao é usável
+            if (!recursoJogador || recursoJogador.amount < quantidade) {
+              skillUsable = false;
+              break;
+            }
+          }
         }
       }
 
+      skill.usable = skillUsable;
     });
-
   });
 
-
-
   res.send(timePersonagens);
-
 });
 
 app.post('/salvartime', (req, res) => {
@@ -132,66 +218,70 @@ app.post('/passarTurno', (req, res) => {
   if(turno.jogadorAtual === 0) //Jogador
   {    
     // --- geração de energia do jogador ---
-    const RNG = Math.floor(Math.random() * 4) + 1;
 
-    switch (RNG) {
-      case 1:
-        console.log("Red");
-        recursosJogador.find(eng => eng.energyType == "red" ).amount++;
-        break;
-      case 2:
-        console.log("Blue");
-        const energyBlue = recursosJogador.find(eng => eng.energyType == "blue" );
-        energyBlue.amount++;
-        break;      
-      case 3: 
-        console.log("Yellow");
-        const energyYellow = recursosJogador.find(eng => eng.energyType == "yellow" );
-        energyYellow.amount++;        
-        break;  
-      case 4:
-        console.log("White");
-        const energyWhite = recursosJogador.find(eng => eng.energyType == "white" );
-        energyWhite.amount++;
-        break;  
-      case 5:
-        console.log("Purple");
-        const energyPurple = recursosJogador.find(eng => eng.energyType == "purple" );
-        energyPurple.amount++;
-        break;  
+    for (let i = 0; i < 3; i++) { // gera 3 energias por turno
+      const RNG = Math.floor(Math.random() * 4) + 1;
+      switch (RNG) 
+      {
+        case 1:
+          console.log("Red");
+          recursosJogador.find(eng => eng.energyType == "red" ).amount++;
+          break;
+        case 2:
+          console.log("Blue");
+          const energyBlue = recursosJogador.find(eng => eng.energyType == "blue" );
+          energyBlue.amount++;
+          break;      
+        case 3: 
+          console.log("Yellow");
+          const energyYellow = recursosJogador.find(eng => eng.energyType == "yellow" );
+          energyYellow.amount++;        
+          break;  
+        case 4:
+          console.log("White");
+          const energyWhite = recursosJogador.find(eng => eng.energyType == "white" );
+          energyWhite.amount++;
+          break;  
+        case 5:
+          console.log("Purple");
+          const energyPurple = recursosJogador.find(eng => eng.energyType == "purple" );
+          energyPurple.amount++;
+          break;  
+      }
     }
   }
-  else //CPU
+  else // CPU
   {    
-    // geração de energia do CPU
+    // --- geração de energia do CPU ---
 
-    const rngCPU = Math.floor(Math.random() * 4) + 1;
-
-    switch (rngCPU) {
-      case 1:
-        console.log("Red CPU");
-        recursosCPU.find(eng => eng.energyType == "red" ).amount++;
-        break;
-      case 2:
-        console.log("Blue CPU");
-        const energyBlue = recursosCPU.find(eng => eng.energyType == "blue" );
-        energyBlue.amount++;
-        break;
-      case 3: 
-        console.log("Yellow CPU");
-        const energyYellow = recursosCPU.find(eng => eng.energyType == "yellow" );
-        energyYellow.amount++;        
-        break;
-      case 4:
-        console.log("White CPU"); 
-        const energyWhite = recursosCPU.find(eng => eng.energyType == "white" );
-        energyWhite.amount++;
-        break;
-      case 5:
-        console.log("Purple CPU");
-        const energyPurple = recursosCPU.find(eng => eng.energyType == "purple" );
-        energyPurple.amount++;
-        break;  
+    for (let i = 0; i < 3; i++) { // gera 3 energias por turno
+      const rngCPU = Math.floor(Math.random() * 4) + 1;
+      switch (rngCPU) {
+        case 1:
+          console.log("Red CPU");
+          recursosCPU.find(eng => eng.energyType == "red" ).amount++;
+          break;
+        case 2:
+          console.log("Blue CPU");
+          const energyBlue = recursosCPU.find(eng => eng.energyType == "blue" );
+          energyBlue.amount++;
+          break;
+        case 3: 
+          console.log("Yellow CPU");
+          const energyYellow = recursosCPU.find(eng => eng.energyType == "yellow" );
+          energyYellow.amount++;        
+          break;
+        case 4:
+          console.log("White CPU"); 
+          const energyWhite = recursosCPU.find(eng => eng.energyType == "white" );
+          energyWhite.amount++;
+          break;
+        case 5:
+          console.log("Purple CPU");
+          const energyPurple = recursosCPU.find(eng => eng.energyType == "purple" );
+          energyPurple.amount++;
+          break;  
+      }
     }
   }
   
@@ -211,17 +301,9 @@ app.post('/passarTurno', (req, res) => {
     turno: turno
   };
 
-  if(turno.jogadorAtual === 0) {
-    console.log("Turno do Jogador");
-    setTimeout(() => {
-      res.send(dadosPartida);
-    }, 3000);
-  }
-  else 
-    {
-      console.log("Turno do CPU");
-      res.send(dadosPartida);
-  }  
+  console.log("Enviando dados da partida (Instantâneo)..."); // nao usar timeout no servidor
+    res.send(dadosPartida);
+
 });
 
 app.listen(port, () => {

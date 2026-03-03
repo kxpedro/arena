@@ -13,9 +13,17 @@
                     "name": "Zangetsu Slash",
                     "description": "This character deals 20 physical damage to an enemy.",
                     "skilltags": ["Physical", "Instant"],
-                    "target": {"enemy": 1, "multitarget": false},
-                    "damage": {"type": "physical", "value": 20},
-                    "energycost": {"red": 1},
+                    "target": {
+                        "enemy": 1,
+                        "multitarget": false
+                    },
+                    "damage": {
+                        "type": "physical",
+                         "value": 20
+                    },
+                    "energycost": {
+                        "red": 1
+                    },
                     "cooldown": 0
                 },
                 {
@@ -26,7 +34,10 @@
                     "skilltags": ["Energy", "Instant"],
                     "target": {"enemy": 1, "multitarget": false},
                     "damage": {"type": "energy", "value": 35},
-                    "energycost": {"yellow": 1, "red": 1},
+                    "energycost": {
+                        "yellow": 1,
+                         "red": 1
+                    },
                     "cooldown": 1
                 },
                 {
@@ -141,7 +152,7 @@
                     "effects": [
                         {"effectname": "dmgvulnerability", "physical": 5, "energy": 5, "duration": 2}
                     ],
-                    "energycost": {"black": 1},
+                    "energycost": {"yellow": 1},
                     "cooldown": 0
                 },
                 {
@@ -155,7 +166,7 @@
                         {"effectname": "giveshield", "value": 20, "duration": 1},
                         {"effectname": "heal", "value": 10}
                     ],
-                    "energycost": {"black": 1},
+                    "energycost": {"yellow": 1},
                     "cooldown": 1
                 },
                 {
@@ -262,14 +273,14 @@
                     "skillid": 13,
                     "skillportrait": "https://i.imgur.com/n8DBJH9.png",
                     "name": "Reckless Rush",
-                    "description": "This character deals 30 physical damage to an enemy and receives 5 physical damage. For 2 turns, the target's non-true damage will be decreased by 10 points. This skill can instead be cast on this character, increasing his physical damage by 10 points and consuming all stacks of Violence to heal him by 5 health points for each stack. With 5 stacks or more of Violence, this skill will cost 1 black energy and will heal 10 health instead of 5 for each stack.",
+                    "description": "This character deals 30 physical damage to an enemy and receives 5 physical damage. For 2 turns, the target's non-true damage will be decreased by 10 points. This skill can instead be cast on this character, increasing his physical damage by 10 points and consuming all stacks of Violence to heal him by 5 health points for each stack. With 5 stacks or more of Violence, this skill will cost 1 random energy and will heal 10 health instead of 5 for each stack.",
                     "skilltags": ["Physical", "Instant", "Strategy", "Heal"],
                     "target": {"enemy": 1, "multitarget": false},
                     "damage": {"type": "physical", "value": 10, "ignorearmor": true},
                     "effects": [
                         {"effectname": "dmgvulnerability", "physical": 5, "energy": 5, "duration": 2}
                     ],
-                    "energycost": {"black": 1},
+                    "energycost": {"white": 1},
                     "cooldown": 0
                 },
                 {
@@ -295,7 +306,7 @@
                     "effects": [
                         {"effectname": "cleanse", "duration": 2}
                     ],
-                    "energycost": {"white": 1},
+                    "energycost": {"black": 1,"white": 1},
                     "cooldown": 2
                 },
                 {

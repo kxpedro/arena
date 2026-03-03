@@ -69,14 +69,12 @@
                             data-description        ="<%= personagem.description %>"
                             data-name               ="<%= personagem.name %>"
                             data-portrait           ="<%= personagem.portrait %>"
-                            onclick                 ="infobox(this)"
+                            onclick                 ="infobox(this, false)"
+                            data-isCpu              ="false"
                             data-charid             ="<%= personagem.charid %>" 
                             style                   ="background-image: url('<%= personagem.portrait %>');">
                         </div>
-                        <div class="health-bar">100 / 100</div>
-
-                        <!-- onclick="infobox('<%= personagem.description %>', '<%= personagem.name %>', '<%= personagem.portrait %>')"  -->
-
+                        <div class="health-bar">100 / <%= personagem.health %></div>
                     </div>
                     <div class="skills-rect">
                     <% personagem.skills.forEach(function(skill) { %> 
@@ -84,13 +82,13 @@
                             data-description    ="<%= skill.description %>"
                             data-name           ="<%= skill.name %>"
                             data-portrait       ="<%= skill.skillportrait %>"
-                            onclick             ="infobox(this)"
+                            data-energycost     ="<%= skill.energycost %>"
+                            data-isCpu          ="false"
+                            onclick             ="infobox(this, true)"
                             data-skillid        ="<%= skill.skillid %>" 
+                            data-targetInfo     ="<%=JSON.stringify(skill.target)%>"
                             style               ="background-image: url('<%= skill.skillportrait %>');">
                         </div>
-
-                        <!-- onclick="infobox('<%= skill.description %>', '<%= skill.name %>', '<%= skill.skillportrait %>')"  -->
-
                     <% }); %>
                     </div>
                 </div>                
@@ -104,14 +102,13 @@
                         data-description    ="<%= cpu.description %>"
                         data-name           ="<%= cpu.name %>"
                         data-portrait       ="<%= cpu.portrait %>"
-                        onclick             ="infobox(this)"
+                        onclick             ="infobox(this, false)"
                         data-charid         ="<%= cpu.charid %>" 
+                        data-health         = "<%= cpu.health %>"
+                        data-isCpu          ="true"
                         style               ="background-image: url('<%= cpu.portrait %>');">
                     </div>
-                    <div class="health-bar">100 / 100</div>
-
-                    <!-- onclick="infobox('<%= cpu.description %>', '<%= cpu.name %>', '<%= cpu.portrait %>')"  -->
-
+                    <div id="cpuhealth_<%= cpu.charid %>" class="health-bar">100 / <%= cpu.health %></div>
                 </div>      
             <% }); %>
         </aside>
@@ -124,26 +121,54 @@
 </body>
 
 <script>
-    
-    document.addEventListener("DOMContentLoaded", function() {
-        startCountdown(300);
 
+    var timerInterval; // variável global para armazenar o intervalo do timer
+    var selectedSkill;
+
+    document.addEventListener("DOMContentLoaded", function() {
+        startCountdown(600);
+        updateSkillAvailability();
         //Fetch para validar quais skills estão disponíveis para o jogador, e quais estão bloqueadas, baseado nos recursos atuais do jogador, e atualizar a interface de acordo
         //Quando começar a partida, atribuir recursos pro jogador.        
         //Usar localstore para identificar os personagens e suas skill, e os recursos do jogador.
 
     });
 
+    function updateSkillAvailability() {
+        fetch("/validarUsoSkills")
+        .then(response => response.json())
+        .then(personagens => {
+            personagens.forEach(personagem => {
+                personagem.skills.forEach(skill => {
+                    const skillElement = document.querySelector(`.skill[data-skillid='${skill.skillid}']`);
+                    if (skillElement) {
+                        if (skill.usable) {
+                            skillElement.style.filter = "grayscale(0%)";
+                            skillElement.style.cursor = "pointer";
+                        } else {
+                            skillElement.style.filter = "grayscale(100%)";
+                            skillElement.style.cursor = "pointer";
+                        }
+                    }
+                });
+            });
+        })
+        .catch(error => console.error("Erro ao validar uso das skills:", error));
+    }
+
     function startCountdown(contador) {
+        // limpar qualquer timer que esteja rodando antes de começar um novo
+        clearInterval(timerInterval);
+
         var bar = document.getElementById("timer-fill");
+        bar.style.width = "100%";
         var width = 100;
-        var interval = setInterval(frame, contador);
+        timerInterval = setInterval(frame, contador);
 
         function frame() {
             if (width <= 0) {
-                clearInterval(interval);                
-                //Passar turno
-                endturn();
+                clearInterval(timerInterval);                
+                endturn(); // passa o turno automaticamente quando o tempo acabar
             } else {
                 width--;
                 bar.style.width = width + "%";
@@ -151,23 +176,137 @@
         }
     }
 
-    function infobox(element) {
+    function infobox(element, isSkill) {
+        const description = element.getAttribute('data-description');
+        const name = element.getAttribute('data-name');
+        const portrait = element.getAttribute('data-portrait');
+        const isCpu = element.getAttribute('data-isCpu');
 
-        const description =     element.getAttribute('data-description');
-        const name =            element.getAttribute('data-name');
-        const portrait =        element.getAttribute('data-portrait');
+        document.querySelector('.infoboxportrait').style.backgroundImage = `url('${portrait}')`;
+        document.querySelector('.infoboxname').textContent = name.toUpperCase();
+        document.querySelector('.infoboxdesc').innerHTML = `<p>${description.toUpperCase()}</p>`;
 
-        document.querySelector('.infoboxportrait')  .style.backgroundImage = `url('${portrait}')`;
-        document.querySelector('.infoboxname')      .textContent = name.toUpperCase();
-        document.querySelector('.infoboxdesc')      .innerHTML = `<p>${description.toUpperCase()}</p>`;
+        document.querySelector('.infoboxportrait').style.display = 'block';
+        document.querySelector('.infoboxname').style.display = 'block';
+        document.querySelector('.infoboxdesc').style.display = 'block';        
 
-        document.querySelector('.infoboxportrait').     style.display = 'block';
-        document.querySelector('.infoboxname').         style.display = 'block';
-        document.querySelector('.infoboxdesc').         style.display = 'block';
+        if(!isSkill && isCpu === "true"){ //Se for o personagem da CPU
+            
+            if(selectedSkill){                
+                const targetInfo = JSON.parse(selectedSkill.getAttribute('data-targetInfo'));
+                
+                if(targetInfo.enemy == 1){
+                    alert(`You used ${selectedSkill.getAttribute('data-name')} on ${name}!`);
+                    var cpuPortraits = document.querySelectorAll('.cpu-portrait');
+                        cpuPortraits.forEach(portrait => {
+                        portrait.style.cursor = "default";
+                        portrait.style.border = "3px solid black";
+                    });
+
+                    const skillId = selectedSkill.getAttribute('data-skillid');
+                    var target = {
+                        charId: element.getAttribute('data-charid'),
+                        enemy: targetInfo.enemy,
+                        ally: targetInfo.ally,
+                        self: targetInfo.self,
+                        health: element.getAttribute('data-health')
+                    };
+
+                    useSkill(skillId, target);
+
+                }else if(targetInfo.self == 1 && targetInfo.ally == 0){ //Usar skill em si mesmo, mas não pode usar em personagens aliados
+                    alert(`You used ${selectedSkill.getAttribute('data-name')} on ${name}!`); 
+                }else if(targetInfo.self == 1 && targetInfo.ally == 1){ //Usar skill em si mesmo e em personagens aliados
+                    alert(`You used ${selectedSkill.getAttribute('data-name')} on ${name}!`); 
+                }else if(targetInfo.self == 0 && targetInfo.ally == 1){ //Usar skill em personagens aliados
+                    alert(`You used ${selectedSkill.getAttribute('data-name')} on ${name}!`); 
+                }else{
+                    alert("You can't target this character with the selected skill! Please select a valid target."); // Aqui você pode substituir por uma função que mostre uma mensagem de erro ou simplesmente
+                    return;
+                }
+            }else{
+                alert(`This is an opponent's character, ${name}.`); // Aqui você pode substituir por uma função que mostre detalhes do personagem, como status, buffs, debuffs, etc.
+            }
+        }
+        else if(!isSkill && isCpu === "false"){ //Se for o personagem do jogador
+            if(selectedSkill){
+                
+                const targetInfo = JSON.parse(selectedSkill.getAttribute('data-targetInfo'));
+
+                if(targetInfo.self == 1){                    
+                    alert(`You used ${selectedSkill.getAttribute('data-name')} on ${name}!`); // Aqui você pode substituir por uma função que envie a ação para o servidor  
+                }else if(targetInfo.enemy == 1){
+                    alert("You can't target this character with the selected skill! Please select a valid target."); // Aqui você pode substituir por uma função que mostre uma mensagem de erro ou simplesmente
+                    return;
+                }
+                
+            }else{
+                alert(`This is your character, ${name}.`); // Aqui você pode substituir por uma função que mostre detalhes do personagem, como status, buffs, debuffs, etc.
+            }
+        }
+        else if(isSkill && isCpu === "false"){ //Se for uma skill do jogador
+            selectedSkill = element; 
+            alert(`You selected ${name}. Click on an opponent's character to use this skill.`); // Aqui você pode substituir por uma função que mostre detalhes da skill, como efeitos, dano, etc., e permita que o jogador escolha um alvo para usar a skill
+
+            const targetInfo = JSON.parse(selectedSkill.getAttribute('data-targetInfo'));
+            if(targetInfo.enemy == 1){
+                var cpuPortraits = document.querySelectorAll('.cpu-portrait');
+                cpuPortraits.forEach(portrait => {
+                    portrait.style.cursor = "pointer";
+                    portrait.style.border = "3px solid red"; // Destaca os personagens da CPU como alvos válidos
+                });
+            }else{
+                var playerPortraits = document.querySelectorAll('.portrait');
+                playerPortraits.forEach(portrait => {
+                    portrait.style.cursor = "pointer";
+                    portrait.style.border = "3px solid green"; // Destaca os personagens do jogador como alvos válidos
+                });
+            }
+        }
+        else if(isSkill && isCpu === "true"){ //Se for uma skill da CPU
+            alert(`This is an opponent's skill, ${name}.`); // Aqui você pode substituir por uma função que mostre detalhes da skill, como efeitos, dano, etc.
+        }else{                           
+
+        }
+    }
+
+    function useSkill(skillId, target) {
+        fetch("/usarSkill", {
+            method: "POST",
+            body: JSON.stringify({ skillId: skillId, target: target }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        }).then(response => {             
+            console.log("Resposta do servidor após usar skill:", response);
+            response.json().then(data => {
+                console.log("Dados recebidos do servidor:", data);
+                updateCharacterHealth(data.charid, data.healthBarNewValue, data.isDefeated, data.enemy);
+            });
+        });
+    }
+
+    function updateCharacterHealth(charId, newHealthValue, isDefeated, enemy) {
+        
+        if (enemy === 1) {
+            var healthBar = document.getElementById(`cpuhealth_${charId}`);
+            healthBar.textContent = `${newHealthValue} / 100`; // Atualiza o texto da barra de saúde
+             
+            if (isDefeated) {
+                alert(`You defeated the enemy character with charId ${charId}!`); // Aqui você pode substituir por uma função que mostre uma mensagem de vitória, remova o personagem da tela, etc.
+                document.querySelector(`.cpu-portrait[data-charid='${charId}']`).style.filter = "grayscale(100%)"; // Deixa o retrato do personagem derrotado em tons de cinza
+                document.querySelector(`.cpu-portrait[data-charid='${charId}']`).style.cursor = "default"; // Remove o cursor de ponteiro para indicar que não é mais um alvo válido
+            }
+        } else {
+            var healthBar = document.querySelector(`.portrait[data-charid='${charId}']`).nextElementSibling; // Supondo que a barra de saúde esteja logo após o retrato
+        }
 
     }
 
     function endturn() {
+        // ao clicar pausa o timer
+        clearInterval(timerInterval);
+
         fetch("/passarTurno", {
             method: "POST",
             headers: {
@@ -186,25 +325,28 @@
                     }
                 });
 
+                updateSkillAvailability(); // atualiza a disponibilidade das skills baseado nos novos recursos do jogador
+
                 const turnButton = document.getElementById('turn-button');
                 if (dadosPartida.turno.jogadorAtual === 0) {
                     turnButton.textContent = "CLICK HERE TO END TURN";
                     document.getElementById("infoJogadorAtual").textContent = "Jogador";
                     document.getElementById("infoContadorTurno").textContent = `Turn: ${dadosPartida.turno.contadordeTurnos}`;
-                    startCountdown(300);
+                    startCountdown(600);
                 } 
                 else {
                     turnButton.textContent = "OPPONENT'S TURN";
                     document.getElementById("infoJogadorAtual").textContent = "CPU";
                     document.getElementById("infoContadorTurno").textContent = `Turn: ${dadosPartida.turno.contadordeTurnos}`;
-                    // startCountdown(70);
+
+                    turnButton.onclick = null; // desabilita o clique no botão durante o turno do CPU
+
+                    startCountdown(300);
 
                     setTimeout(() => { // Simula o tempo de resposta do CPU, e depois passa o turno de volta para o jogador
                         fetch("/passarTurno", {
                             method: "POST",
-                            headers: {
-                                "Content-type": "application/json; charset=UTF-8"
-                            }
+                            headers: { "Content-type": "application/json; charset=UTF-8" }
                         }).then(response => { // energias atualizadas
                             response.json().then(dadosPartida => {
                                 console.log("Dados do servidor:", dadosPartida);                 
@@ -216,21 +358,25 @@
                                     }
                                 });
 
+                                updateSkillAvailability();
+
                                 const turnButton = document.getElementById('turn-button');
+                                turnButton.onclick = endturn; // reabilita o clique no botão para o jogador
+
                                 if (dadosPartida.turno.jogadorAtual === 0) {
                                     turnButton.textContent = "CLICK HERE TO END TURN";
                                     document.getElementById("infoJogadorAtual").textContent = "Jogador";
                                     document.getElementById("infoContadorTurno").textContent = `Turn: ${dadosPartida.turno.contadordeTurnos}`;
-                                    startCountdown(300);
+                                    startCountdown(600);
                                 } else {
                                     turnButton.textContent = "OPPONENT'S TURN";
                                     document.getElementById("infoJogadorAtual").textContent = "CPU";
                                     document.getElementById("infoContadorTurno").textContent = `Turn: ${dadosPartida.turno.contadordeTurnos}`;                                    
-                                    // startCountdown(70);
+                                    startCountdown(300);
                                 }
                             });
                         });
-                    }, 1000);
+                    }, 30000);
                 }
             });
         });
