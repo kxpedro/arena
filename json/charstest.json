@@ -20,7 +20,7 @@
                 },
                 {
                     "skillid": 2,
-                    "skillportrait": "https://imgur.com/0yigStg.png",
+                    "skillportrait": "https://imgur.com/FWCce28.png",
                     "name": "Hollow Slayer",
                     "description": "This character deals 35 energy damage to an enemy.",
                     "skilltags": ["Energy", "Instant"],
@@ -39,7 +39,7 @@
                     "effects": [
                         {"effectname": "giveshield", "value": 25}
                     ],
-                    "energycost": {"random": 1},
+                    "energycost": {"black": 1},
                     "usablewhileactive": false,
                     "cooldown": 3
                 },
@@ -53,7 +53,7 @@
                     "effects": [
                          {"effectname": "invul", "duration": 1}
                     ],
-                    "energycost": {"random": 1},
+                    "energycost": {"black": 1},
                     "cooldown": 4
                 }
             ]
@@ -97,13 +97,13 @@
                     "skillid": 7,
                     "skillportrait": "https://imgur.com/vK9aFRm.png",
                     "name": "Gokon Tekko",
-                    "description": "This character removes 1 random energy from one enemy.",
+                    "description": "This character removes 1 black energy from one enemy.",
                     "skilltags": ["Strategy", "Instant"],
                     "target": {"enemy": 3, "multitarget": false},
                     "effects": [
-                        {"effectname": "removetargetenergy", "value": 1, "random": true}
+                        {"effectname": "removetargetenergy", "value": 1, "black": true}
                     ],
-                    "energycost": {"random": 1},
+                    "energycost": {"black": 1},
                     "cooldown": 3
                 },
                 {
@@ -118,7 +118,7 @@
                             "effectname": "invul", "duration": 1
                         }
                     ],
-                    "energycost": {"random": 1},
+                    "energycost": {"black": 1},
                     "cooldown": 4
                 }
             ]
@@ -141,7 +141,7 @@
                     "effects": [
                         {"effectname": "dmgvulnerability", "physical": 5, "energy": 5, "duration": 2}
                     ],
-                    "energycost": {"random": 1},
+                    "energycost": {"black": 1},
                     "cooldown": 0
                 },
                 {
@@ -155,7 +155,7 @@
                         {"effectname": "giveshield", "value": 20, "duration": 1},
                         {"effectname": "heal", "value": 10}
                     ],
-                    "energycost": {"random": 1},
+                    "energycost": {"black": 1},
                     "cooldown": 1
                 },
                 {
@@ -169,7 +169,7 @@
                         {"effectname": "cleanse", "duration": 2},
                         {"effectname": "heal", "value": 25, "duration": 2}
                     ],
-                    "energycost": {"yellow": 1, "random": 1},
+                    "energycost": {"yellow": 1, "black": 1},
                     "cooldown": 2
                 },
                 {
@@ -182,7 +182,133 @@
                     "effects": [
                         {"effectname": "invul", "duration": 1}
                     ],
-                    "energycost": {"random": 1},
+                    "energycost": {"black": 1},
+                    "cooldown": 4
+                }
+            ]
+        },
+        {
+            "charid": 4,
+            "name": "Arisawa Tatsuki",
+            "description": "The childhood friend of Ichigo and Orihime; Tatsuki is strong willed but protective of her friends. Despite having little ability in reiatsu, Tatsuki is an expert in martial arts, which she uses to pound at her enemies while giving openings to her allies to follow up.",
+            "tags": ["Human", "Karakura Town"],
+            "portrait": "https://imgur.com/pFeqb0V.png",
+            "skills": [
+                {
+                    "skillid": 9,
+                    "skillportrait": "https://imgur.com/jmffNSH.png",
+                    "name": "Gut Breaker",
+                    "description": "This character does a sequence of powerful kicks, dealing an initial 10 physical damage to one enemy and stunning them for 1 turn. The following 2 turns, that enemy will receive an additional 10 physical damage each turn, and this character will gain 10 points of damage reduction*. This skill stacks.",
+                    "skilltags": ["Physical", "Instant"],
+                    "target": {"enemy": 1, "multitarget": false},
+                    "damage": {"type": "physical", "value": 10, "ignorearmor": true},
+                    "effects": [
+                        {"effectname": "dmgvulnerability", "physical": 5, "energy": 5, "duration": 2}
+                    ],
+                    "energycost": {"black": 1},
+                    "cooldown": 0
+                },
+                {
+                    "skillid": 10,
+                    "skillportrait": "https://imgur.com/muvFyyX.png",
+                    "name": "Swift Knee Pounce",
+                    "description": "This character creates an opening for her allies by doing a front knee strike to one enemy dealing 10 physical damage to them for 2 turns. During this time, if a character uses a new harmful non-strategic skill on them, they'll heal 10 health*.",
+                    "skilltags": ["Heal", "Strategy", "Instant"],
+                    "target": {"self": 1, "ally": 1, "multitarget": true},
+                    "effects": [
+                        {"effectname": "giveshield", "value": 20, "duration": 1},
+                        {"effectname": "heal", "value": 10}
+                    ],
+                    "energycost": {"black": 1},
+                    "cooldown": 1
+                },
+                {
+                    "skillid": 11,
+                    "skillportrait": "https://imgur.com/336gbiN.png",
+                    "name": "Fighting Spirit",
+                    "description": "This character boosts herself or one ally's will to fight. The following 2 turns, This character or that ally will deal 5 additional damage with non-affliction skills, heal 10 health each time they use a new non-strategic skill, and have 10 points of damage reduction.",
+                    "skilltags": ["Strategy", "Instant"],
+                    "target": {"ally": 1},
+                    "effects": [
+                        {"effectname": "cleanse", "duration": 2},
+                        {"effectname": "heal", "value": 25, "duration": 2}
+                    ],
+                    "energycost": {"yellow": 1, "black": 1},
+                    "cooldown": 2
+                },
+                {
+                    "skillid": 12,
+                    "skillportrait": "https://imgur.com/L2fA3k4.png",
+                    "name": "Hide",
+                    "description": "This skill makes Tatsuki invulnerable for 1 turn.",
+                    "skilltags": ["Strategy", "Instant"],  
+                    "target": {"self": 1, "multitarget": false},
+                    "effects": [
+                        {"effectname": "invul", "duration": 1}
+                    ],
+                    "energycost": {"black": 1},
+                    "cooldown": 4
+                }
+            ]
+        },
+        {
+            "charid": 5,
+            "name": "Kaien Shiba (Metastacia)",
+            "description": "The body of the former lieutenant of the 13ª Division was briefly possessed by the Hollow Metastacia, in which his body was used to attack both Ukitake and Rukia. As this body is disposable, Metastacia uses it wildly with no regard for its safety.",
+            "tags": ["Shinigami", "Shiba Clan", "Hollow"],
+            "portrait": "https://i.imgur.com/vSObXqN.png",
+            "skills": [
+                {
+                    "skillid": 13,
+                    "skillportrait": "https://i.imgur.com/n8DBJH9.png",
+                    "name": "Reckless Rush",
+                    "description": "This character deals 30 physical damage to an enemy and receives 5 physical damage. For 2 turns, the target's non-true damage will be decreased by 10 points. This skill can instead be cast on this character, increasing his physical damage by 10 points and consuming all stacks of Violence to heal him by 5 health points for each stack. With 5 stacks or more of Violence, this skill will cost 1 black energy and will heal 10 health instead of 5 for each stack.",
+                    "skilltags": ["Physical", "Instant", "Strategy", "Heal"],
+                    "target": {"enemy": 1, "multitarget": false},
+                    "damage": {"type": "physical", "value": 10, "ignorearmor": true},
+                    "effects": [
+                        {"effectname": "dmgvulnerability", "physical": 5, "energy": 5, "duration": 2}
+                    ],
+                    "energycost": {"black": 1},
+                    "cooldown": 0
+                },
+                {
+                    "skillid": 14,
+                    "skillportrait": "https://i.imgur.com/ukY7r5B.png",
+                    "name": "Lust for Violence",
+                    "description": "For 3 turns, this character receives 10 armor and every time this character loses health, he permanently gains a stack of Violence. Additionally, every time Reckless Rush is used, this skill will have its duration extended by 1 turn. Each stack of Violence increases the damage of Reckless Rush by 5 points, and this skill may not be used while active.",
+                    "skilltags": ["Strategy", "Instant"],
+                    "target": {"self": 1, "multitarget": false},
+                    "effects": [
+                        {"effectname": "givearmor", "value": 10, "duration": 3}
+                    ],
+                    "energycost": {"black": 1},
+                    "cooldown": 1
+                },
+                {
+                    "skillid": 15,
+                    "skillportrait": "https://i.imgur.com/87KYXvm.png",
+                    "name": "Blade Catch",
+                    "description": "For 1 turn, the first non-strategy skill used on this character will be negated and the user of that skill will have the cost of their skills increased by 1 black energy for 3 turns. Additionally, this character gains 2 stacks of Violence and for the next 3 turns Reckless Rush will target all enemies.",
+                    "skilltags": ["Strategy", "Instant"],
+                    "target": {"ally": 1},
+                    "effects": [
+                        {"effectname": "cleanse", "duration": 2}
+                    ],
+                    "energycost": {"white": 1},
+                    "cooldown": 2
+                },
+                {
+                    "skillid": 16,
+                    "skillportrait": "https://i.imgur.com/6mxHuMN.png",
+                    "name": "Narrow Escape",
+                    "description": "This skill makes this character invulnerable for 1 turn.",
+                    "skilltags": ["Strategy", "Instant"],  
+                    "target": {"self": 1, "multitarget": false},
+                    "effects": [
+                        {"effectname": "invul", "duration": 1}
+                    ],
+                    "energycost": {"black": 1},
                     "cooldown": 4
                 }
             ]

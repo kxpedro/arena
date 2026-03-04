@@ -1,0 +1,19 @@
+{
+  "name": "arena",
+  "version": "1.0.0",
+  "description": "initial",
+  "main": "index.html",
+  "scripts": {
+    "test": "testarena"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matheusres497/arena.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/matheusres497/arena/issues"
+  },
+  "homepage": "https://github.com/matheusres497/arena#readme"
+}

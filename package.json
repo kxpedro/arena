@@ -1,22 +1,10 @@
 {
 <<<<<<< Updated upstream
-  "name": "arena",
-  "version": "1.0.0",
-  "description": "initial",
-  "main": "index.html",
-  "scripts": {
-    "test": "testarena"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/matheusres497/arena.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/matheusres497/arena/issues"
-  },
-  "homepage": "https://github.com/matheusres497/arena#readme"
+  "dependencies": {
+    "ejs": "^4.0.1",
+    "express": "^5.2.1",
+    "node-localstorage": "^3.0.5"
+  }
 =======
   "dependencies": {
     "ejs": "^4.0.1",

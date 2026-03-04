@@ -1,17 +1,10 @@
 const express = require('express');
 const path = require('path');
-const http = require('http');
-const { Server } = require('socket.io');
 const app = express();
 const port = 3000;
 
 const jsonCharstest = require('./json/charstest.json');
-const jsonUsers = require('./json/users.json');
-
-const httpServer = http.createServer(app);
-const io = new Server(httpServer, {
-  cors: { origin: "*" } // Libere o CORS para testes
-});
+const { json } = require('stream/consumers');
 
 if (typeof localStorage === "undefined" || localStorage === null) {
   var LocalStorage = require('node-localstorage').LocalStorage;
@@ -24,98 +17,14 @@ app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html'); 
 app.set('views', __dirname);
 
-let waitingPlayers = [];
-const activeGames = {}; // Object to store active games and their players
-
-io.on('connection', (socket) => {
-    console.log('A user connected:', socket.id);
-
-    // Event for a player to join the matchmaking queue
-    socket.on('findMatch', () => {
-        // Add the current player to the waiting list
-        waitingPlayers.push(socket.id);
-        console.log('Player', socket.id, 'joined queue. Current queue length:', waitingPlayers.length);
-
-        // Check if there are enough players to start a match
-        if (waitingPlayers.length >= 2) {
-            const player1Id = waitingPlayers.shift();
-            const player2Id = waitingPlayers.shift();
-            const gameId = 'game_' + Math.random().toString(36).substr(2, 9); // Generate a unique game ID
-
-            // Get the actual socket objects for the players
-            const player1Socket = io.sockets.sockets.get(player1Id);
-            const player2Socket = io.sockets.sockets.get(player2Id);
-
-            if (player1Socket && player2Socket) {
-                // Have both players join the same private room
-                player1Socket.join(gameId);
-                player2Socket.join(gameId);
-
-                // Store game state in activeGames object (server-side only, no DB call)
-                activeGames[gameId] = {
-                    player1: player1Id,
-                    player2: player2Id,
-                    // ... other game specific data (scores, turns, etc)
-                };
-
-                console.log('Match started for Game ID:', gameId, 'Players:', player1Id, player2Id);
-
-                // Notify both players that a match has been found and provide the gameId
-                io.to(gameId).emit('matchFound', { gameId: gameId, opponentId: player2Id }); // Can tailor message for each player
-            } else {
-                // If a player disconnected before match found, put the other back in queue
-                if (player1Socket) waitingPlayers.push(player1Id);
-                if (player2Socket) waitingPlayers.push(player2Id);
-            }
-        } else {
-            // Notify the player they are waiting
-            socket.emit('waitingForOpponent');
-        }
-    });
-
-    // Handle game events within the specific game room
-    socket.on('gameAction', (data) => {
-        const { gameId, action } = data;
-        // Broadcast the action to the *other* player in the same room
-        socket.to(gameId).emit('opponentAction', action);
-    });
-
-    // Handle player disconnections
-    socket.on('disconnect', () => {
-        console.log('Player disconnected:', socket.id);
-        // Remove from waiting queue
-        waitingPlayers = waitingPlayers.filter(id => id !== socket.id);
-
-        // Check if they were in an active game and notify the opponent
-        for (const gameId in activeGames) {
-            if (activeGames[gameId].player1 === socket.id || activeGames[gameId].player2 === socket.id) {
-                const opponentId = activeGames[gameId].player1 === socket.id ? activeGames[gameId].player2 : activeGames[gameId].player1;
-                io.to(opponentId).emit('opponentDisconnected');
-                delete activeGames[gameId]; // Clean up the game
-                break;
-            }
-        }
-    });
-});
-
-app.get('/', (req, res) => {  
+app.get('/', (req, res) => {
   res.render(path.join(__dirname, 'index'));
 });
 
 app.get('/jogar', (req, res) => {
-  localStorage.removeItem('loggedUser');
+  res.render('game', { jsonData: jsonCharstest });
   localStorage.removeItem('recursosJogador');
   localStorage.removeItem('recursosCPU');
-  localStorage.removeItem('turno');
-
-  //Validar se usuário existe.
-  var user = jsonUsers.users.find(user => user.username === req.query.username && user.password === req.query.password);
-  if(!user){
-    return res.status(401).send('Invalid username or password');
-  }
-  
-  localStorage.setItem('loggedUser', JSON.stringify(user));
-  res.render('game', { jsonData: jsonCharstest, user: user });
 });
 
 app.get('/partida', (req, res) => {
@@ -315,6 +224,6 @@ app.post('/passarTurno', (req, res) => {
   }  
 });
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+app.listen(port, () => {
+  console.log(`Servidor rodando em http://localhost:${port}`);
 });

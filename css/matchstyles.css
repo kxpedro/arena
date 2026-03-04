@@ -31,8 +31,20 @@ body{
   bottom: 50px;
 }
 
+.player-card:nth-child(1) .skills-rect{
+  transform: translateY(25px);
+}
+
+.player-card:nth-child(2) .skills-rect{
+  transform: translateY(35px);
+}
+
+.player-card:nth-child(3) .skills-rect{
+  transform: translateY(42px);
+}
+
 /* Portrait square */
-.portraitc1{
+.portrait{
   background-image: url("/img/charportraits/1.png");
   width:150px;
   height:150px;
@@ -43,29 +55,7 @@ body{
   font-weight:700;
 }
 
-.portraitc2{
-  background-image: url("/img/charportraits/2.png");
-  width:150px;
-  height:150px;
-  border:3px black solid;
-  align-items:center;
-  justify-content:center;
-  color:#f7d9d9;
-  font-weight:700;
-}
-
-.portraitc3{
-  background-image: url("/img/charportraits/3.png");
-  width:150px;
-  height:150px;
-  border:3px black solid;
-  align-items:center;
-  justify-content:center;
-  color:#f7d9d9;
-  font-weight:700;
-}
-
-.skills-rect1{
+.skills-rect{
   width: 500px;
   height: 100px;
   display:flex;
@@ -75,27 +65,7 @@ body{
   transform: translateY(23%);
 }
 
-.skills-rect2{
-  width: 500px;
-  height: 100px;
-  display:flex;
-  align-items:center;
-  justify-content:space-around;
-  padding:8px;
-  transform: translateY(30%);
-}
-
-.skills-rect3{
-  width: 500px;
-  height: 100px;
-  display:flex;
-  align-items:center;
-  justify-content:space-around;
-  padding:8px;
-  transform: translateY(35%);
-}
-
-.skill1, .skill2, .skill3, .skill4, .skill5, .skill6, .skill7, .skill8, .skill9, .skill10, .skill11, .skill12{
+.skill{
   width:100px;
   height:100px;
   border:2px black solid;
@@ -115,30 +85,8 @@ body{
   transform: translateY(-50%);
 }
 
-.cpu-portrait1{
+.cpu-portrait{
   background-image: url("/img/charportraits/4.png");
-  transform: scaleX(-1);
-  width:150px;
-  height:150px;
-  border:3px black solid;
-  align-items:center;
-  justify-content:center;
-  color:#f7d9d9;
-}
-
-.cpu-portrait2{
-  background-image: url("/img/charportraits/5.jpeg");
-  transform: scaleX(-1);
-  width:150px;
-  height:150px;
-  border:3px black solid;
-  align-items:center;
-  justify-content:center;
-  color:#f7d9d9;
-}
-
-.cpu-portrait3{
-  background-image: url("/img/charportraits/6.png");
   transform: scaleX(-1);
   width:150px;
   height:150px;
@@ -174,7 +122,7 @@ width: 150px;
   
   }
 
-  .skillinfoboxname{
+  .infoboxname{
     font-family: monospace, monospace;
     color: darkred;
     font-weight: 600;
@@ -184,7 +132,7 @@ width: 150px;
     left: 570px;
 }
 
-  .skillinfoboxdesc{
+  .infoboxdesc{
     font-family: monospace, monospace;
     color: black;
     font-weight: 600;
@@ -195,7 +143,7 @@ width: 150px;
     bottom: -10px;
     left: 570px;
 }
-  .skilinfoportrait{
+  .infoboxportrait{
     width: 125px;
     height: 125px;
     border: 2px solid black;
@@ -203,7 +151,6 @@ width: 150px;
     bottom: 17px;
     background-size: cover;
     position: absolute;
-
 }
 
 .hud-top {
@@ -288,7 +235,7 @@ width: 150px;
 }
 
 .timer-fill {
-    width: 75%;
+    width: 100%;
     height: 100%;
     background: linear-gradient(90deg, black, red);
     display: block;
@@ -323,3 +270,4 @@ width: 150px;
 .c-yellow { background-color: yellow; }
 .c-red    { background-color: red; }
 .c-black  { background-color: black; }
+.c-purple { background-color: purple; }

@@ -186,6 +186,77 @@
                     ],
                     "energycost": {"random": 1},
                     "cooldown": 4
+                },
+            "charid": 5,
+            "name": "Kaien Shiba (Metastacia)",
+            "description": "The body of the former lieutenant of the 13ª Division was briefly possessed by the Hollow Metastacia, in which his body was used to attack both Ukitake and Rukia. As this body is disposable, Metastacia uses it wildly with no regard for its safety.",
+            "tags": ["Shinigami", "Shiba Clan", "Hollow"],
+            "portrait": "https://i.imgur.com/vSObXqN.png",
+            "skills": [
+                {
+                    "skillid": 13,
+                    "skillportrait": "https://i.imgur.com/n8DBJH9.png",
+                    "name": "Reckless Rush",
+                    "description": "This character deals 30 physical damage to an enemy and receives 5 physical damage. For 2 turns, the target's non-true damage will be decreased by 10 points. This skill can instead be cast on this character, increasing his physical damage by 10 points and consuming all stacks of Violence to heal him by 5 health points for each stack. With 5 stacks or more of Violence, this skill will cost 1 random energy and will heal 10 health instead of 5 for each stack.",
+                    "skilltags": ["Physical", "Instant", "Strategy", "Heal"],
+                    "target": {"enemy": 1, "multitarget": false},
+                    "damage": {"type": "physical", "value": 10, "ignorearmor": true},
+                    "effects": [
+                        {"effectname": "dmgvulnerability", "physical": 5, "energy": 5, "duration": 2}
+                    ],
+                    "energycost": {"random": 1},
+                    "cooldown": 0
+                },
+                {
+                    "skillid": 14,
+                    "skillportrait": "https://i.imgur.com/ukY7r5B.png",
+                    "name": "Lust for Violence",
+                    "description": "For 3 turns, this character receives 10 armor and every time this character loses health, he permanently gains a stack of Violence. Additionally, every time Reckless Rush is used, this skill will have its duration extended by 1 turn. Each stack of Violence increases the damage of Reckless Rush by 5 points, and this skill may not be used while active.",
+                    "skilltags": ["Strategy", "Instant"],
+                    "target": {"self": 1, "multitarget": false},
+                    "effects": [
+                        {"effectname": "givearmor", "value": 10, "duration": 3}
+                    ],
+                    "energycost": {"random": 1},
+                    "cooldown": 1
+                },
+                {
+                    "skillid": 15,
+                    "skillportrait": "https://i.imgur.com/87KYXvm.png",
+                    "name": "Blade Catch",
+                    "description": "For 1 turn, the first non-strategy skill used on this character will be negated and the user of that skill will have the cost of their skills increased by 1 random energy for 3 turns. Additionally, this character gains 2 stacks of Violence and for the next 3 turns Reckless Rush will target all enemies.",
+                    "skilltags": ["Strategy", "Instant"],
+                    "target": {"ally": 1},
+                    "effects": [
+                        {"effectname": "cleanse", "duration": 2}
+                    ],
+                    "energycost": {"white": 1},
+                    "cooldown": 2
+                },
+                {
+                    "skillid": 16,
+                    "skillportrait": "https://i.imgur.com/6mxHuMN.png",
+                    "name": "Narrow Escape",
+                    "description": "This skill makes this character invulnerable for 1 turn.",
+                    "skilltags": ["Strategy", "Instant"],  
+                    "target": {"self": 1, "multitarget": false},
+                    "effects": [
+                        {"effectname": "invul", "duration": 1}
+                    ],
+                    "energycost": {"random": 1},
+                    "cooldown": 4
+                },
+                {
+                    "skillid": 0,
+                    "skillportrait": "https://i.imgur.com/QKdVwJU.png",
+                    "name": "Bloodshedding",
+                    "description": "This character cannot reduce incoming damage to a value below that of 1, and cannot gain shield points.",
+                    "skilltags": ["Passive"],  
+                    "target": {"self": 1, "multitarget": false},
+                    "effects": [
+                    ],
+                    "energycost": {"random": 0},
+                    "cooldown": 4
                 }
             ]
         }
