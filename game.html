@@ -13,8 +13,7 @@
     <div id="settingsOverlay" class="settings-overlay">
         <div class="settings-box">
             <span class="close-settings-btn" onclick="toggleSettings()">&times;</span>
-            <h2>SETTINGS</h2>
-            
+            <h2>SETTINGS</h2>            
             <div class="setting-option">
                 <label class="switch-container">
                     <span>Use Desktop Cursor</span>
@@ -38,27 +37,34 @@
             </div>
         </div>
     </div>
-
-
-    <div class="player-info">
-        <div class="player-portrait" style="background-image: url('img/charportraits/0.png');"></div>
-        <div class="player-name">Player 1</div>
-        <div class="player-rank">Initiate</div>
-        <div class="player-level">Level: 1</div>
-        <div class="player-ratio">Win Ratio: 0:0</div>
+    <div class="menuinfobox">
+        <div class="menuinfoboxportrait"></div>
+        <div class="menuinfoboxskills"></div>
+        <div class="menuinfoboxskillportrait"></div>
+        <div class="menuinfoboxname"></div>
+        <div class="menuinfoboxdescription"></div>
+        <div class="menuinfoboxtags"></div>
+        <div class="menuinfoboxenergy"></div>
+        <div class="menuinfoboxcooldown"></div>
     </div>
-
-    <div class="team-grid">
-        <div class="team-box" style="background-image: url('img/charportraits/1.png');"></div>
-        <div class="team-box" style="background-image: url('img/charportraits/2.png');"></div>
-        <div class="team-box" style="background-image: url('img/charportraits/3.png');"></div>
+    <div class="player-info">
+        <div class="player-portrait" style="background-image: url('<%= user.profilePicture %>');"></div>
+        <div class="player-name"><%= user.name %></div>
+        <div class="player-rank">Initiate</div>
+        <div class="player-level">Level: <%= user.level %></div>
+        <div class="player-ratio">Win Ratio: <%= user.winRatio %></div>
+    </div>
+    <div id="team-grid-id" class="team-grid" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <div id="team-box-1" data-charid="0" draggable="true" class="team-box" style="background-image: url('img/charportraits/0.png');"></div>
+        <div id="team-box-2" data-charid="0" draggable="true" class="team-box" style="background-image: url('img/charportraits/0.png');"></div>
+        <div id="team-box-3" data-charid="0" draggable="true" class="team-box" style="background-image: url('img/charportraits/0.png');"></div>
         <p class="teamtext">SELECT 3 CHARACTERS INTO YOUR TEAM</p>
     </div>
     <div class="exit-button">
-        <button>Exit Game</button>
+        <button id="exitGameButton" onclick="window.close();">Exit Game</button>
     </div>
     <div class="playermatch-button">
-        <button>Player Match</button>
+        <button id="find-match-btn">Player Match</button>
     </div>
     <div class="private-match-button">
         <button>Private Match</button>
@@ -67,31 +73,228 @@
         <button onclick="startMatch()">CPU Match</button>
     </div>
     <div class="character-grid">
-        <div class="box" style="background-image: url('img/charportraits/1.png');"></div>
-        <div class="box" style="background-image: url('img/charportraits/2.png');"></div>
-        <div class="box" style="background-image: url('img/charportraits/3.png');"></div>
-        <div class="box" style="background-image: url('img/charportraits/4.png');"></div>
-        <div class="box" style="background-image: url('img/charportraits/5.jpeg');"></div>
-        <div class="box" style="background-image: url('img/charportraits/6.png');"></div>
-        <div class="box" style="background-image: url('img/charportraits/0.png');"></div>
-        <div class="box" style="background-image: url('img/charportraits/0.png');"></div>
-        <div class="box" style="background-image: url('img/charportraits/0.png');"></div>
-        <div class="box" style="background-image: url('img/charportraits/0.png');"></div>
-        <div class="box" style="background-image: url('img/charportraits/0.png');"></div>
-        <div class="box" style="background-image: url('img/charportraits/0.png');"></div>
-        <div class="box" style="background-image: url('img/charportraits/0.png');"></div>
-        <div class="box" style="background-image: url('img/charportraits/0.png');"></div>
-        <div class="box" style="background-image: url('img/charportraits/0.png');"></div>
-        <div class="box" style="background-image: url('img/charportraits/0.png');"></div>
-        <div class="box" style="background-image: url('img/charportraits/0.png');"></div>
-        <div class="box" style="background-image: url('img/charportraits/0.png');"></div>
-        <div class="box" style="background-image: url('img/charportraits/0.png');"></div>
-        <div class="box" style="background-image: url('img/charportraits/0.png');"></div>
-        <div class="box" style="background-image: url('img/charportraits/0.png');"></div>
+        <% jsonData.characters.forEach(function(personagem) { %>
+        <div draggable="true" 
+            ondragstart="rastrearMovimento(event)"
+            onclick="showMenuinfobox(this)" 
+            class="box" 
+            data-charid="<%= personagem.charid %>" 
+            data-name="<%= personagem.name %>"
+            data-description="<%= personagem.description %>"
+            data-tags="<%= personagem.tags.join(', ') %>"
+            data-portrait="<%= personagem.portrait %>"
+            data-skills="<%= JSON.stringify(personagem.skills) %>"
+            id="charid-<%= personagem.charid %>" 
+            style="background-image: url('<%= personagem.portrait %>');"></div>
+        <% }); %>        
     </div>
 </body>
 <script src="js/script.js"></script>
-<script>
+<script src="https://cdn.socket.io/4.8.3/socket.io.min.js" integrity="sha384-kzavj5fiMwLKzzD1f8S7TeoVIEi7uKHvbTA3ueZkrzYq75pNQUiUi6Dy98Q3fxb0" crossorigin="anonymous"></script>
+
+<script type="text/javascript">
+    const socket = io(); // Connects to the server
+
+    // When the user clicks a "Find Match" button
+    document.getElementById('find-match-btn').addEventListener('click', () => {
+        socket.emit('findMatch');
+        console.log('Sent findMatch request');
+    });
+
+    // Listen for a match being found
+    socket.on('matchFound', (data) => {
+        console.log('Match found! Game ID:', data.gameId);
+        // Proceed to game screen, pass gameId to game logic
+        // ... game logic to start the match ...
+    });
+
+    // Listen for the waiting message
+    socket.on('waitingForOpponent', () => {
+        console.log('Waiting for an opponent...');
+        // Update UI to show "Searching..."
+    });
+
+    // Listen for game actions from the opponent
+    socket.on('opponentAction', (action) => {
+        // Process the opponent's move in your game logic
+    });
+
+    // Listen for opponent disconnection
+    socket.on('opponentDisconnected', () => {
+        console.log('Your opponent disconnected.');
+        // Handle end-game scenario (e.g., return to main menu, declare winner)
+    });
+
+</script>
+
+<script type="text/javascript">
+
+    function showMenuinfobox(element) {
+        const charID = element.getAttribute("data-charid");
+
+        if (!charID || charID === "0") {
+            document.querySelector(".menuinfobox").style.display = "none";
+            return;
+        }
+
+        const name = element.getAttribute("data-name");
+        const description = element.getAttribute("data-description");
+        const tags = element.getAttribute("data-tags");
+        const portrait = element.getAttribute("data-portrait");
+        const skillsInfo = element.getAttribute("data-skills");
+
+        document.querySelector(".menuinfoboxportrait").style.backgroundImage = `url('${portrait}')`;
+        document.querySelector(".menuinfoboxname").textContent = name.toUpperCase();
+        document.querySelector('.menuinfoboxdescription').innerHTML = `<p>${description}</p>`;
+        document.querySelector('.menuinfoboxtags').textContent = `Tags: ${tags}`;
+        
+        document.querySelector(".menuinfoboxskillportrait").style.display = "none";
+        document.querySelector(".menuinfoboxenergy").style.display = "none";
+        document.querySelector(".menuinfoboxcooldown").style.display = "none";
+
+        const skillsContainer = document.querySelector(".menuinfoboxskills");
+        skillsContainer.innerHTML = "";
+
+        if (skillsInfo) {
+            const skillsArray = JSON.parse(skillsInfo);
+            skillsArray.forEach(skill => {
+                const skillDiv = document.createElement("div");
+                skillDiv.className = "menuinfoboxskill";
+                skillDiv.style.backgroundImage = `url('${skill.skillportrait}')`;
+
+                skillDiv.onclick = function() {
+                    showSkillInfo(skill);
+                };
+
+                skillsContainer.appendChild(skillDiv);
+            });
+        }
+
+        document.querySelector(".menuinfobox").style.display = "block";
+
+    }
+
+    function showSkillInfo(skill) {
+        document.querySelector(".menuinfoboxname").textContent = skill.name.toUpperCase();
+        document.querySelector(".menuinfoboxdescription").innerHTML = `<p>${skill.description}</p>`;
+        
+        const skillPortrait = document.querySelector(".menuinfoboxskillportrait");
+        skillPortrait.style.backgroundImage = `url('${skill.skillportrait}')`;
+        skillPortrait.style.display = "block";
+
+        if (skill.skilltags) {
+            document.querySelector(".menuinfoboxtags").textContent = `Tags: ${skill.skilltags.join(', ')}`;
+        }
+
+        const cooldownBox = document.querySelector(".menuinfoboxcooldown");
+        cooldownBox.textContent = `Cooldown: ${skill.cooldown}`;
+        cooldownBox.style.display = "block";
+
+        const energyBox = document.querySelector(".menuinfoboxenergy");
+        energyBox.innerHTML = "";
+
+        if (skill.energycost && Object.keys(skill.energycost).length > 0) {
+            const prefixSpan = document.createElement("span");
+            prefixSpan.textContent = "Energy: ";
+            prefixSpan.style.marginRight = "5px"; 
+            energyBox.appendChild(prefixSpan);
+
+            for (const [type, amount] of Object.entries(skill.energycost)) {
+                for (let i = 0; i < amount; i++) {
+                    const boxDiv = document.createElement("div");
+                    boxDiv.className = `c-box c-${type.toLowerCase()}`;
+                    energyBox.appendChild(boxDiv);
+                }
+            }
+        } else {
+            const freeSpan = document.createElement("span");
+            freeSpan.className = "energy-item";
+            freeSpan.textContent = "Energy:";
+            energyBox.appendChild(freeSpan);
+        }
+
+        energyBox.style.display = "flex";
+        energyBox.style.flexDirection = "row";
+        energyBox.style.alignItems = "center";
+    }
+
+    function drop(event) {
+        event.preventDefault();
+        var charId = event.dataTransfer.getData("personagem");
+        var targetBox = event.target;
+
+        if (!targetBox.classList.contains("team-box")) {
+            targetBox = targetBox.closest(".team-box");
+        }
+
+        if (charId && targetBox && targetBox.classList.contains("team-box")) {
+            var originalChar = document.getElementById(charId);
+
+            if (originalChar) {
+                var charPortrait = originalChar.style.backgroundImage;
+                targetBox.style.backgroundImage = charPortrait;
+                targetBox.setAttribute("data-charid", charId.split("-")[1]);
+
+                targetBox.setAttribute("data-name", originalChar.getAttribute("data-name"));
+                targetBox.setAttribute("data-description", originalChar.getAttribute("data-description"));
+                targetBox.setAttribute("data-tags", originalChar.getAttribute("data-tags"));
+                targetBox.setAttribute("data-portrait", originalChar.getAttribute("data-portrait"));
+                targetBox.setAttribute("data-skills", originalChar.getAttribute("data-skills"));
+
+                targetBox.onclick = function() { showMenuinfobox(this); };
+
+            }
+
+            originalChar.style.visibility = "hidden";
+
+            targetBox.ondblclick = removerPersonagem;
+
+            const char1 = document.getElementById("team-box-1").getAttribute("data-charid");
+            const char2 = document.getElementById("team-box-2").getAttribute("data-charid");
+            const char3 = document.getElementById("team-box-3").getAttribute("data-charid");
+
+            fetch("/salvartime", {
+                method: "POST",
+                body: JSON.stringify([char1, char2, char3]),
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8"
+                }
+                });
+
+        }
+    }
+
+    function removerPersonagem(event) {
+        var targetBox = event.currentTarget;
+        var charIdValue = targetBox.getAttribute("data-charid");
+
+        if (charIdValue && charIdValue !== "0") {
+            // 1. Torna o personagem visível na grid novamente
+            var originalChar = document.getElementById("charid-" + charIdValue);
+            if (originalChar) {
+                originalChar.style.visibility = "visible";
+            }
+
+            // 2. Reseta a caixa de equipe para o estado vazio (imagem 0.png)
+            targetBox.style.backgroundImage = "url('img/charportraits/0.png')";
+            targetBox.setAttribute("data-charid", "0");
+            
+            console.log("Personagem removido da equipe.");
+
+            document.querySelector(".menuinfobox").style.display = "none";
+
+        }
+    }
+
+    function allowDrop(event) {
+        event.preventDefault();
+    }
+
+    function rastrearMovimento(event) {
+        var charId = event.target.getAttribute("data-charid");
+        event.dataTransfer.setData("personagem", "charid-" + charId);
+    }
+
     function createWindow(src, width, height){
         var win = window.open(src, "_new", "width="+width+",height="+height);
         win.addEventListener("resize", function(){
@@ -100,12 +303,25 @@
         });
     }
 
-        function startMatch() {
-            const width = 1280;
-            const height = 960;
-            createWindow("matchoffline.html", width, height);
-            // window.open('matchoffline.html', 'gameWindow', `width=${width},height=${height},resizable=no`);
+    function startMatch() {
+
+        const char1 = document.getElementById("team-box-1").getAttribute("data-charid");
+        const char2 = document.getElementById("team-box-2").getAttribute("data-charid");
+        const char3 = document.getElementById("team-box-3").getAttribute("data-charid");
+
+        if (char1 == "0" || char2 == "0" || char3 == "0") {
+            alert("Selecione 3 personagens antes de começar!");
+            return;
         }
-    </script>
+
+        const width = 1280;
+        const height = 960;
+
+        // const url = `matchoffline.html?p1=${char1}&p2=${char2}&p3=${char3}`;
+        const url = `/partida`;
+
+        createWindow(url, width, height);
+    }
+</script>
 
 </html>

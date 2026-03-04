@@ -1,0 +1,31 @@
+{
+    "users": [
+        {
+            "id": 1,
+            "username": "player1",
+            "password": "player1",
+            "name": "Player One",
+            "level": 1,
+            "winRatio" : 0.0,
+            "profilePicture": "img/userimg/img1.jpg"
+        },
+        {
+            "id": 2,
+            "username": "player2",
+            "password": "player2",
+            "name": "Player Two",
+            "level": 1,
+            "winRatio" : 0.0,
+            "profilePicture": "img/userimg/img2.jpg"
+        },
+        {
+            "id": 3,
+            "username": "player3",
+            "password": "player3",
+            "name": "Player Three",
+            "level": 1,
+            "winRatio" : 0.0,
+            "profilePicture": "img/userimg/img3.jpg"
+        }
+    ]    
+}

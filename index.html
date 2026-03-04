@@ -31,22 +31,43 @@
     </style>
 </head>
 <body>
-    <button onclick="openGame()">Open Game</button>
-    <script>
 
-    function createWindow(src, width, height){
-        var win = window.open(src, "_new", "width="+width+",height="+height);
-        win.addEventListener("resize", function(){
-            console.log("Resized");
-            win.resizeTo(width, height);
-        });
-    }
+    <div style="text-align: center;">
+        <h1 style="color: white; text-align: center;">Welcome to the Arena</h1>
+        <br>
+        <label for="username" style="color: white; text-align: center;">Username:</label>
+        <br>
+        <input type="text" id="username" name="username">
+        <br><br>
+        <label for="password" style="color: white; text-align: center;">Password:</label>
+        <br>
+        <input type="password" id="password" name="password">
+        <br><br><br>
+        <button onclick="openGame()">Open Game</button>
+    </div>
+
+    <script type="text/javascript">
+
+        function createWindow(src, width, height){
+            const params = new URLSearchParams();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            params.set('username', username);
+            params.set('password', password);
+
+            const url = `${src}?${params.toString()}`;
+            var win = window.open(url, "_new", "width="+width+", height="+height);
+
+            win.addEventListener("resize", function(){
+                console.log("Resized");
+                win.resizeTo(width, height);
+            });
+        }
 
         function openGame() {
             const width = 1280;
             const height = 960;
-            createWindow("game.html", width, height);
-            // window.open('matchoffline.html', 'gameWindow', `width=${width},height=${height},resizable=no`);
+            createWindow("/jogar", width, height);
         }
     </script>
 </body>

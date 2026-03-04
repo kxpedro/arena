@@ -1,4 +1,5 @@
 {
+<<<<<<< Updated upstream
   "name": "arena",
   "version": "1.0.0",
   "description": "initial",
@@ -16,4 +17,12 @@
     "url": "https://github.com/matheusres497/arena/issues"
   },
   "homepage": "https://github.com/matheusres497/arena#readme"
+=======
+  "dependencies": {
+    "ejs": "^4.0.1",
+    "express": "^5.2.1",
+    "node-localstorage": "^3.0.5",
+    "socket.io": "^4.8.3"
+  }
+>>>>>>> Stashed changes
 }
